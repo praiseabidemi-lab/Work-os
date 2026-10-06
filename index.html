@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Work OS">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Work OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --hive-black:#2C1A2E;
+    --golden:#EF9F27;
+    --comb-white:#F7F5F0;
+    --text-secondary:#6E5C70;
+    --border:#E4DFDC;
+    --card-bg:#FFFFFF;
+    --danger:#B3432E;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; overscroll-behavior-y:none;}
+  body{
+    background:var(--comb-white);
+    color:var(--hive-black);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding-bottom:2.5rem;
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:0 1.25rem;}
+
+  /* Header */
+  header{padding:1.75rem 0 1rem;}
+  h1{
+    font-family:'Playfair Display',serif;
+    font-weight:600;
+    font-size:26px;
+    margin:0 0 3px;
+    letter-spacing:-0.01em;
+  }
+  .sub{font-size:13px;color:var(--text-secondary);margin:0;}
+
+  /* Tab menu */
+  .tab-menu{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding:0.75rem 0 1.25rem;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .tab-menu::-webkit-scrollbar{display:none;}
+  .tab-chip{
+    flex-shrink:0;
+    padding:8px 16px;
+    border-radius:20px;
+    border:1px solid var(--border);
+    background:var(--card-bg);
+    font-size:13px;
+    font-weight:500;
+    color:var(--text-secondary);
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .tab-chip.active{
+    background:var(--hive-black);
+    color:var(--comb-white);
+    border-color:var(--hive-black);
+  }
+  .tab-chip.add{
+    background:transparent;
+    border-style:dashed;
+    color:var(--hive-black);
+  }
+
+  /* Sub-nav within a tab */
+  .subnav{
+    display:flex;
+    gap:4px;
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:4px;
+    margin-bottom:1.25rem;
+  }
+  .subnav button{
+    flex:1;
+    background:transparent;
+    border:none;
+    padding:9px 0;
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    font-weight:500;
+    color:var(--text-secondary);
+    border-radius:7px;
+    cursor:pointer;
+  }
+  .subnav button.active{
+    background:var(--golden);
+    color:var(--hive-black);
+  }
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  /* Tasks */
+  .task-row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:0.7rem 0.85rem;
+    margin-bottom:8px;
+  }
+  .task-row.done{opacity:0.5;}
+  .task-row.done .task-text{text-decoration:line-through;}
+  .task-check{
+    width:19px;height:19px;flex-shrink:0;margin-top:1px;
+    border:1.5px solid var(--hive-black);
+    border-radius:5px;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--comb-white);
+  }
+  .task-check.checked{background:var(--golden);border-color:var(--golden);}
+  .task-check.checked::after{content:'✓';font-size:12px;color:var(--hive-black);font-weight:600;}
+  .task-body{flex:1;}
+  .task-text{font-size:14px;line-height:1.4;margin:0;}
+  .priority-badge{
+    display:inline-block;
+    font-size:10px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    padding:2px 7px;
+    border-radius:4px;
+    margin-top:5px;
+  }
+  .priority-now{background:#FAEEDA;color:var(--hive-black);}
+  .priority-later{background:#EFEAE4;color:var(--text-secondary);}
+  .task-del{background:none;border:none;color:var(--text-secondary);font-size:12px;cursor:pointer;flex-shrink:0;padding:2px 4px;}
+  .task-del:hover{color:var(--danger);}
+
+  .add-row{display:flex;gap:8px;margin-top:12px;}
+  .add-row input, .add-row select{
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    padding:9px 10px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    background:var(--card-bg);
+  }
+  .add-row input{flex:1;min-width:0;}
+  .add-row select{width:88px;flex-shrink:0;}
+  .add-btn{
+    background:var(--hive-black);
+    color:var(--comb-white);
+    border:none;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:9px 16px;
+    border-radius:6px;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+
+  /* Notes */
+  textarea.notes-area{
+    width:100%;
+    min-height:280px;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    line-height:1.6;
+    padding:14px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:var(--card-bg);
+    resize:vertical;
+  }
+  textarea.notes-area:focus{outline:none;border-color:var(--golden);}
+  .save-hint{font-size:11px;color:var(--text-secondary);margin-top:6px;}
+
+  /* Log */
+  .toggle-btn{
+    display:inline-flex;align-items:center;gap:6px;
+    background:transparent;border:1px solid var(--hive-black);color:var(--hive-black);
+    font-family:'Inter',sans-serif;font-size:13px;font-weight:500;
+    padding:9px 16px;border-radius:6px;cursor:pointer;margin-bottom:1.25rem;
+  }
+  form.log-form{
+    background:var(--card-bg);border:1px solid var(--border);border-radius:10px;
+    padding:1.1rem;margin-bottom:1.5rem;display:none;
+  }
+  form.log-form.open{display:block;}
+  .row{display:flex;gap:12px;margin-bottom:12px;}
+  .row > div{flex:1;}
+  label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary);margin-bottom:5px;font-weight:500;}
+  .field{margin-bottom:12px;}
+  input[type=text], input[type=date], textarea.small{
+    width:100%;font-family:'Inter',sans-serif;font-size:14px;padding:8px 10px;
+    border:1px solid var(--border);border-radius:6px;background:var(--comb-white);color:var(--hive-black);
+  }
+  textarea.small{resize:vertical;min-height:44px;}
+  input:focus, textarea:focus{outline:none;border-color:var(--golden);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .save-btn{
+    background:var(--golden);color:var(--hive-black);border:none;
+    font-family:'Inter',sans-serif;font-weight:600;font-size:14px;
+    padding:10px 20px;border-radius:6px;cursor:pointer;margin-top:2px;
+  }
+  .entry{
+    background:var(--card-bg);border:1px solid var(--border);border-left:3px solid var(--golden);
+    border-radius:8px;padding:1rem 1.1rem;margin-bottom:12px;
+  }
+  .entry-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;}
+  .tag-date{display:flex;align-items:center;gap:8px;min-width:0;}
+  .tag{
+    font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;
+    color:var(--hive-black);background:#FAEEDA;padding:3px 8px;border-radius:4px;white-space:nowrap;
+  }
+  .date{font-size:12px;color:var(--text-secondary);white-space:nowrap;}
+  .entry-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+  .entry-actions select{
+    font-size:11px;font-family:'Inter',sans-serif;border:1px solid var(--border);border-radius:5px;
+    padding:3px 4px;background:var(--comb-white);color:var(--text-secondary);
+  }
+  .del{background:none;border:none;color:var(--text-secondary);font-size:12px;cursor:pointer;padding:2px 4px;}
+  .del:hover{color:var(--danger);}
+  .shipped{font-size:15px;font-weight:500;margin:0 0 8px;}
+  .note-label{font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.03em;margin-bottom:2px;}
+  .note-text{font-size:13px;line-height:1.5;margin:0;}
+  .empty{text-align:center;padding:2.5rem 1rem;color:var(--text-secondary);font-size:14px;}
+
+  @media (max-width:480px){
+    .row{flex-direction:column;gap:12px;}
+    .grid2{grid-template-columns:1fr;}
+    .add-row{flex-wrap:wrap;}
+    .add-row select{width:auto;flex:1;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Work OS</h1>
+    <p class="sub">Everything about work, one place. Tap a job to open it.</p>
+  </header>
+
+  <div class="tab-menu" id="tabMenu"></div>
+
+  <div class="subnav">
+    <button data-panel="tasks" class="active">Tasks</button>
+    <button data-panel="notes">Notes</button>
+    <button data-panel="log">Log</button>
+  </div>
+
+  <div class="panel active" id="panel-tasks">
+    <div id="taskList"></div>
+    <div class="add-row">
+      <input type="text" id="newTaskText" placeholder="Add a task…">
+      <select id="newTaskPriority">
+        <option value="now">Now</option>
+        <option value="later">Later</option>
+      </select>
+      <button class="add-btn" id="addTaskBtn">Add</button>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-notes">
+    <textarea class="notes-area" id="notesArea" placeholder="Anything you want to remember for this job — edits made, things to check, context to keep…"></textarea>
+    <div class="save-hint" id="notesSaveHint">Saves automatically as you type.</div>
+  </div>
+
+  <div class="panel" id="panel-log">
+    <button class="toggle-btn" id="toggleLogForm">+ Log an entry</button>
+    <form class="log-form" id="logForm">
+      <div class="row">
+        <div>
+          <label for="f-date">Date</label>
+          <input type="date" id="f-date">
+        </div>
+        <div>
+          <label for="f-type">Type</label>
+          <input type="text" id="f-type" placeholder="e.g. Social post, Applied to job">
+        </div>
+      </div>
+      <div class="field">
+        <label for="f-shipped">What happened</label>
+        <input type="text" id="f-shipped" placeholder="e.g. Posted design update on LinkedIn">
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="f-worked">What worked</label>
+          <textarea class="small" id="f-worked" placeholder="Optional"></textarea>
+        </div>
+        <div class="field">
+          <label for="f-change">What to change</label>
+          <textarea class="small" id="f-change" placeholder="Optional"></textarea>
+        </div>
+      </div>
+      <button type="button" class="save-btn" id="saveLogBtn">Save entry</button>
+    </form>
+    <div id="logEntries"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TABS_KEY = 'workos-tabs';
+  const activePanelDefault = 'tasks';
+  let tabs = [];
+  let activeTabId = null;
+  let activePanel = activePanelDefault;
+
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+  function loadJSON(key, fallback){
+    try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function saveJSON(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+
+  function tasksKey(tabId){ return 'workos-tasks-' + tabId; }
+  function notesKey(tabId){ return 'workos-notes-' + tabId; }
+  function logKey(tabId){ return 'workos-log-' + tabId; }
+
+  function seedIfEmpty(){
+    if(localStorage.getItem(TABS_KEY)) return;
+    const bslId = uid();
+    const careerId = uid();
+    tabs = [
+      { id: bslId, name: 'Bee Systems Lab' },
+      { id: careerId, name: 'Career Hunting' }
+    ];
+    saveJSON(TABS_KEY, tabs);
+    saveJSON(tasksKey(bslId), [
+      { id: uid(), text: 'Start posting design posts on social — been too long', priority: 'now', done: false },
+      { id: uid(), text: 'Re-review Brand Bible for recent edits before sending to team', priority: 'now', done: false },
+      { id: uid(), text: 'Think through team restructure — how to stay active', priority: 'later', done: false },
+      { id: uid(), text: 'Go through Israel\\'s org note / digital organization doc', priority: 'now', done: false }
+    ]);
+    saveJSON(notesKey(bslId), '');
+    saveJSON(logKey(bslId), []);
+    saveJSON(tasksKey(careerId), [
+      { id: uid(), text: 'Get clarity on the career path I actually want', priority: 'now', done: false },
+      { id: uid(), text: 'Build out portfolio', priority: 'later', done: false },
+      { id: uid(), text: 'Start applying', priority: 'later', done: false }
+    ]);
+    saveJSON(notesKey(careerId), '');
+    saveJSON(logKey(careerId), []);
+    activeTabId = bslId;
+  }
+
+  function init(){
+    seedIfEmpty();
+    tabs = loadJSON(TABS_KEY, []);
+    if(!activeTabId && tabs.length) activeTabId = tabs[0].id;
+    renderTabMenu();
+    renderPanel();
+  }
+
+  function renderTabMenu(){
+    const menu = document.getElementById('tabMenu');
+    menu.innerHTML = tabs.map(function(t){
+      return '<div class="tab-chip'+(t.id===activeTabId?' active':'')+'" data-id="'+t.id+'">'+escapeHtml(t.name)+'</div>';
+    }).join('') + '<div class="tab-chip add" id="addTabChip">+ Add</div>';
+
+    menu.querySelectorAll('.tab-chip[data-id]').forEach(function(chip){
+      chip.addEventListener('click', function(){
+        activeTabId = chip.getAttribute('data-id');
+        renderTabMenu();
+        renderPanel();
+      });
+      chip.addEventListener('contextmenu', function(e){ e.preventDefault(); maybeRemoveTab(chip.getAttribute('data-id')); });
+      let pressTimer;
+      chip.addEventListener('touchstart', function(){ pressTimer = setTimeout(function(){ maybeRemoveTab(chip.getAttribute('data-id')); }, 600); });
+      chip.addEventListener('touchend', function(){ clearTimeout(pressTimer); });
+    });
+    document.getElementById('addTabChip').addEventListener('click', function(){
+      const name = prompt('Name this job or responsibility:');
+      if(name && name.trim()){
+        const id = uid();
+        tabs.push({ id: id, name: name.trim() });
+        saveJSON(TABS_KEY, tabs);
+        saveJSON(tasksKey(id), []);
+        saveJSON(notesKey(id), '');
+        saveJSON(logKey(id), []);
+        activeTabId = id;
+        renderTabMenu();
+        renderPanel();
+      }
+    });
+  }
+
+  function maybeRemoveTab(id){
+    const tab = tabs.find(function(t){ return t.id === id; });
+    if(!tab) return;
+    if(confirm('Remove "'+tab.name+'" and all its tasks, notes, and log entries? This can\\'t be undone.')){
+      tabs = tabs.filter(function(t){ return t.id !== id; });
+      saveJSON(TABS_KEY, tabs);
+      localStorage.removeItem(tasksKey(id));
+      localStorage.removeItem(notesKey(id));
+      localStorage.removeItem(logKey(id));
+      if(activeTabId === id) activeTabId = tabs.length ? tabs[0].id : null;
+      renderTabMenu();
+      renderPanel();
+    }
+  }
+
+  // Sub-nav
+  document.querySelectorAll('.subnav button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.subnav button').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      activePanel = btn.getAttribute('data-panel');
+      document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+      document.getElementById('panel-'+activePanel).classList.add('active');
+      renderPanel();
+    });
+  });
+
+  function renderPanel(){
+    if(!activeTabId){
+      document.getElementById('taskList').innerHTML = '<div class="empty">No jobs yet. Tap "+ Add" above to create one.</div>';
+      document.getElementById('logEntries').innerHTML = '';
+      document.getElementById('notesArea').value = '';
+      return;
+    }
+    if(activePanel === 'tasks') renderTasks();
+    if(activePanel === 'notes') renderNotes();
+    if(activePanel === 'log') renderLog();
+  }
+
+  // ---- Tasks ----
+  function renderTasks(){
+    const tasks = loadJSON(tasksKey(activeTabId), []);
+    const list = document.getElementById('taskList');
+    if(tasks.length === 0){
+      list.innerHTML = '<div class="empty">No tasks yet for this job.</div>';
+      return;
+    }
+    const sorted = tasks.slice().sort(function(a,b){
+      if(a.done !== b.done) return a.done ? 1 : -1;
+      if(a.priority !== b.priority) return a.priority === 'now' ? -1 : 1;
+      return 0;
+    });
+    list.innerHTML = sorted.map(function(t){
+      return '<div class="task-row'+(t.done?' done':'')+'" data-id="'+t.id+'">'
+        + '<div class="task-check'+(t.done?' checked':'')+'" data-id="'+t.id+'"></div>'
+        + '<div class="task-body"><p class="task-text">'+escapeHtml(t.text)+'</p>'
+        + '<span class="priority-badge priority-'+t.priority+'">'+(t.priority==='now'?'Now':'Later')+'</span></div>'
+        + '<button class="task-del" data-id="'+t.id+'">Delete</button>'
+      + '</div>';
+    }).join('');
+
+    list.querySelectorAll('.task-check').forEach(function(el){
+      el.addEventListener('click', function(){
+        const id = el.getAttribute('data-id');
+        const arr = loadJSON(tasksKey(activeTabId), []);
+        const t = arr.find(function(x){ return x.id === id; });
+        if(t){ t.done = !t.done; saveJSON(tasksKey(activeTabId), arr); renderTasks(); }
+      });
+    });
+    list.querySelectorAll('.task-del').forEach(function(el){
+      el.addEventListener('click', function(){
+        const id = el.getAttribute('data-id');
+        let arr = loadJSON(tasksKey(activeTabId), []);
+        arr = arr.filter(function(x){ return x.id !== id; });
+        saveJSON(tasksKey(activeTabId), arr);
+        renderTasks();
+      });
+    });
+  }
+
+  document.getElementById('addTaskBtn').addEventListener('click', function(){
+    if(!activeTabId) return;
+    const input = document.getElementById('newTaskText');
+    const text = input.value.trim();
+    if(!text) return;
+    const priority = document.getElementById('newTaskPriority').value;
+    const arr = loadJSON(tasksKey(activeTabId), []);
+    arr.push({ id: uid(), text: text, priority: priority, done: false });
+    saveJSON(tasksKey(activeTabId), arr);
+    input.value = '';
+    renderTasks();
+  });
+
+  // ---- Notes ----
+  let notesTimer;
+  function renderNotes(){
+    const notes = loadJSON(notesKey(activeTabId), '');
+    const area = document.getElementById('notesArea');
+    area.value = typeof notes === 'string' ? notes : '';
+  }
+  document.getElementById('notesArea').addEventListener('input', function(e){
+    if(!activeTabId) return;
+    clearTimeout(notesTimer);
+    const val = e.target.value;
+    const hint = document.getElementById('notesSaveHint');
+    hint.textContent = 'Saving…';
+    notesTimer = setTimeout(function(){
+      saveJSON(notesKey(activeTabId), val);
+      hint.textContent = 'Saved.';
+    }, 400);
+  });
+
+  // ---- Log ----
+  document.getElementById('toggleLogForm').addEventListener('click', function(){
+    const form = document.getElementById('logForm');
+    const btn = document.getElementById('toggleLogForm');
+    form.classList.toggle('open');
+    btn.textContent = form.classList.contains('open') ? 'Close' : '+ Log an entry';
+    if(form.classList.contains('open')){
+      document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+    }
+  });
+
+  document.getElementById('saveLogBtn').addEventListener('click', function(){
+    if(!activeTabId) return;
+    const shippedEl = document.getElementById('f-shipped');
+    const shipped = shippedEl.value.trim();
+    if(!shipped){ shippedEl.focus(); return; }
+    const entry = {
+      id: uid(),
+      date: document.getElementById('f-date').value || new Date().toISOString().slice(0,10),
+      type: document.getElementById('f-type').value.trim() || 'General',
+      shipped: shipped,
+      worked: document.getElementById('f-worked').value.trim(),
+      change: document.getElementById('f-change').value.trim()
+    };
+    const arr = loadJSON(logKey(activeTabId), []);
+    arr.push(entry);
+    saveJSON(logKey(activeTabId), arr);
+
+    shippedEl.value = '';
+    document.getElementById('f-type').value = '';
+    document.getElementById('f-worked').value = '';
+    document.getElementById('f-change').value = '';
+    document.getElementById('logForm').classList.remove('open');
+    document.getElementById('toggleLogForm').textContent = '+ Log an entry';
+    renderLog();
+  });
+
+  function renderLog(){
+    const entries = loadJSON(logKey(activeTabId), []);
+    const el = document.getElementById('logEntries');
+    if(entries.length === 0){
+      el.innerHTML = '<div class="empty">No entries yet for this job.</div>';
+      return;
+    }
+    const otherTabs = tabs.filter(function(t){ return t.id !== activeTabId; });
+    const sorted = entries.slice().sort(function(a,b){ return b.date.localeCompare(a.date); });
+    el.innerHTML = sorted.map(function(e){
+      const copyOptions = otherTabs.map(function(t){ return '<option value="'+t.id+'">'+escapeHtml(t.name)+'</option>'; }).join('');
+      return '<div class="entry">'
+        + '<div class="entry-top">'
+          + '<div class="tag-date"><span class="tag">'+escapeHtml(e.type)+'</span><span class="date">'+escapeHtml(e.date)+'</span></div>'
+          + '<div class="entry-actions">'
+            + (otherTabs.length ? '<select class="copy-select" data-id="'+e.id+'"><option value="">Copy to…</option>'+copyOptions+'</select>' : '')
+            + '<button class="del" data-id="'+e.id+'">Delete</button>'
+          + '</div>'
+        + '</div>'
+        + '<p class="shipped">'+escapeHtml(e.shipped)+'</p>'
+        + '<div class="grid2">'
+          + '<div><div class="note-label">Worked</div><p class="note-text">'+(e.worked?escapeHtml(e.worked):'—')+'</p></div>'
+          + '<div><div class="note-label">Change</div><p class="note-text">'+(e.change?escapeHtml(e.change):'—')+'</p></div>'
+        + '</div>'
+      + '</div>';
+    }).join('');
+
+    el.querySelectorAll('.del').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        const id = btn.getAttribute('data-id');
+        let arr = loadJSON(logKey(activeTabId), []);
+        arr = arr.filter(function(x){ return x.id !== id; });
+        saveJSON(logKey(activeTabId), arr);
+        renderLog();
+      });
+    });
+    el.querySelectorAll('.copy-select').forEach(function(sel){
+      sel.addEventListener('change', function(){
+        const destId = sel.value;
+        if(!destId) return;
+        const entryId = sel.getAttribute('data-id');
+        const arr = loadJSON(logKey(activeTabId), []);
+        const entry = arr.find(function(x){ return x.id === entryId; });
+        if(entry){
+          const destArr = loadJSON(logKey(destId), []);
+          destArr.push(Object.assign({}, entry, { id: uid() }));
+          saveJSON(logKey(destId), destArr);
+          const destName = tabs.find(function(t){ return t.id === destId; }).name;
+          sel.value = '';
+          alert('Copied to "' + destName + '".');
+        }
+      });
+    });
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

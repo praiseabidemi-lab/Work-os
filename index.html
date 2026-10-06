@@ -343,7 +343,7 @@
       { id: uid(), text: 'Start posting design posts on social — been too long', priority: 'now', done: false },
       { id: uid(), text: 'Re-review Brand Bible for recent edits before sending to team', priority: 'now', done: false },
       { id: uid(), text: 'Think through team restructure — how to stay active', priority: 'later', done: false },
-      { id: uid(), text: 'Go through Israel\\'s org note / digital organization doc', priority: 'now', done: false }
+      { id: uid(), text: 'Go through Israel\'s org note / digital organization doc', priority: 'now', done: false }
     ]);
     saveJSON(notesKey(bslId), '');
     saveJSON(logKey(bslId), []);
@@ -401,7 +401,7 @@
   function maybeRemoveTab(id){
     const tab = tabs.find(function(t){ return t.id === id; });
     if(!tab) return;
-    if(confirm('Remove "'+tab.name+'" and all its tasks, notes, and log entries? This can\\'t be undone.')){
+    if(confirm('Remove "'+tab.name+'" and all its tasks, notes, and log entries? This can\'t be undone.')){
       tabs = tabs.filter(function(t){ return t.id !== id; });
       saveJSON(TABS_KEY, tabs);
       localStorage.removeItem(tasksKey(id));
